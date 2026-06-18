@@ -1,0 +1,258 @@
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 DONE 0.0s
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 14.88kB 0.0s done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/ubuntu:22.04
+#2 DONE 0.0s
+
+#3 [internal] load .dockerignore
+#3 transferring context: 2B 0.0s done
+#3 DONE 0.0s
+
+#4 [internal] load build context
+#4 DONE 0.0s
+
+#5 [ 1/24] FROM docker.io/library/ubuntu:22.04@sha256:4f838adc7181d9039ac795a7d0aba05a9bd9ecd480d294483169c5def983b64d
+#5 resolve docker.io/library/ubuntu:22.04@sha256:4f838adc7181d9039ac795a7d0aba05a9bd9ecd480d294483169c5def983b64d 0.0s done
+#5 DONE 0.0s
+
+#4 [internal] load build context
+#4 transferring context: 1.32kB 0.0s done
+#4 DONE 0.0s
+
+#6 [ 4/24] RUN cd /tmp  && wget -qO pbs.tar.gz "https://github.com/astral-sh/python-build-standalone/releases/download/20260602/cpython-3.12.13%2B20260602-x86_64-unknown-linux-gnu-install_only.tar.gz"  && mkdir -p /opt/vs  && tar xzf pbs.tar.gz  && mv python /opt/vs/py  && rm -f pbs.tar.gz  && /opt/vs/py/bin/python -m pip install --upgrade pip wheel setuptools  && /opt/vs/py/bin/python -m pip install --upgrade "meson>=1.3" cython numpy  && /opt/vs/py/bin/python -c "import sys; print('bundled python', sys.version)"
+#6 CACHED
+
+#7 [12/24] RUN mkdir -p /opt/vs/plugins /opt/vs/lib /opt/vs/bin
+#7 CACHED
+
+#8 [11/24] RUN cp -v /tmp/vs-src/include/VapourSynth.h /opt/vs/include/  && cp -v /tmp/vs-src/include/VSHelper.h /opt/vs/include/  && cp -v /tmp/vs-src/include/VSScript4.h /opt/vs/include/VSScript.h 2>/dev/null || ln -sf VSScript4.h /opt/vs/include/VSScript.h  && ls -la /opt/vs/include/
+#8 CACHED
+
+#9 [ 6/24] RUN printf "[binaries]\npython = '%s/py/bin/python'\n" "/opt/vs" > /tmp/vs-native.ini  && cat /tmp/vs-native.ini
+#9 CACHED
+
+#10 [13/24] COPY build_plugins.sh /usr/local/bin/build_plugins.sh
+#10 CACHED
+
+#11 [15/24] COPY nnedi3_rpow2.py /opt/vs/py/lib/python3.12/site-packages/nnedi3_rpow2.py
+#11 CACHED
+
+#12 [ 8/24] RUN cd /tmp && git clone --depth 1 --branch R76 https://github.com/vapoursynth/vapoursynth.git vs-src  && cd vs-src  && sed -i "s|install_dir = py.get_install_dir() / 'vapoursynth'|install_dir = '/opt/vs'|" meson.build  && head -45 meson.build | grep install_dir  && /opt/vs/py/bin/meson setup build         --buildtype=release         --prefix=/opt/vs         --libdir=/opt/vs/lib         -Dpython.platlibdir=/opt/vs/py/lib/python3.12/site-packages         -Dpython.purelibdir=/opt/vs/py/lib/python3.12/site-packages         --native-file=/tmp/vs-native.ini  && /opt/vs/py/bin/meson compile -C build  && /opt/vs/py/bin/meson install -C build
+#12 CACHED
+
+#13 [14/24] RUN chmod +x /usr/local/bin/build_plugins.sh && bash /usr/local/bin/build_plugins.sh
+#13 CACHED
+
+#14 [10/24] RUN VSSCRIPT_SO=$(realpath /opt/vs/libvsscript.so)  && PYTHON_LIB=$(find /opt/vs/py/lib -maxdepth 1 -name 'libpython3.12.so.1.0' | head -1)  && PYTHON_LIB=${PYTHON_LIB:-/opt/vs/py/lib/libpython3.12.so.1.0}  && mkdir -p /root/.config/vapoursynth  && printf '"%s" = ["%s", "%s"]\n' "$VSSCRIPT_SO" "/opt/vs/py/bin/python" "$PYTHON_LIB" > /root/.config/vapoursynth/vapoursynth.toml  && echo "--- vsscript config ---" && cat /root/.config/vapoursynth/vapoursynth.toml  && echo "--- ls /opt/vs ---" && ls -la /opt/vs/vspipe /opt/vs/libvapoursynth* /opt/vs/libvsscript*  && echo "--- vspipe version ---" && /opt/vs/vspipe --version
+#14 CACHED
+
+#15 [ 2/24] RUN apt-get update && apt-get install -y --no-install-recommends         software-properties-common ca-certificates gnupg curl wget git zstd     && add-apt-repository -y ppa:deadsnakes/ppa     && apt-get update && apt-get install -y --no-install-recommends         build-essential gcc-11 g++-11         cmake meson ninja-build pkg-config         nasm yasm autoconf automake libtool         patchelf file xz-utils unzip p7zip-full         python3.12 python3.12-dev python3.12-venv         python3-pip         libfftw3-dev libzimg-dev zlib1g-dev         libavcodec-dev libavformat-dev libavutil-dev libswscale-dev libswresample-dev         ocl-icd-opencl-dev opencl-headers         libboost-dev libboost-system-dev libboost-filesystem-dev         libxml2-dev liblzma-dev libbz2-dev libssl-dev     && rm -rf /var/lib/apt/lists/*
+#15 CACHED
+
+#16 [ 3/24] RUN update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-11 100  && update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-11 100
+#16 CACHED
+
+#17 [ 9/24] RUN /opt/vs/py/bin/python -c     "import vapoursynth as vs; print('VapourSynth import OK:', vs.__version__, '/ core', vs.core.core_version)"
+#17 CACHED
+
+#18 [ 5/24] RUN cd /tmp && git clone --depth 1 --branch release-3.0.5 https://github.com/sekrit-twc/zimg.git zimg  && cd zimg  && ./autogen.sh  && ./configure --prefix=/opt/vs --libdir=/opt/vs/lib --enable-static --with-pic  && make -j"$(nproc)"  && make install
+#18 CACHED
+
+#19 [ 7/24] RUN /opt/vs/py/bin/pip install --upgrade vapoursynth==76
+#19 CACHED
+
+#20 [16/24] RUN /opt/vs/py/bin/pip install --upgrade         vsdehalo         vsjetpack         vsutil         vstools  && /opt/vs/py/bin/pip install --upgrade         "git+https://github.com/HomeOfVapourSynthEvolution/mvsfunc.git"  && /opt/vs/py/bin/python -c "import urllib.request as u; open('/opt/vs/py/lib/python3.12/site-packages/adjust.py','wb').write(u.urlopen('https://raw.githubusercontent.com/dubhater/vapoursynth-adjust/master/adjust.py').read())"  && /opt/vs/py/bin/pip install "havsfunc==33"  && /opt/vs/py/bin/python -c "import havsfunc as h; assert hasattr(h,'QTGMC'), 'classic QTGMC missing'; print('havsfunc classic QTGMC OK')"
+#20 CACHED
+
+#21 [17/24] COPY patch_havsfunc.py /usr/local/bin/patch_havsfunc.py
+#21 DONE 0.0s
+
+#22 [18/24] RUN /opt/vs/py/bin/python /usr/local/bin/patch_havsfunc.py
+#22 0.226 OK: havsfunc.py patched at partial creation
+#22 DONE 0.2s
+
+#23 [19/24] RUN cd /tmp && wget -q https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-amd64-static.tar.xz  && tar xJf ffmpeg-release-amd64-static.tar.xz  && cp ffmpeg-*-static/ffmpeg /opt/vs/bin/ffmpeg  && cp ffmpeg-*-static/ffprobe /opt/vs/bin/ffprobe  && chmod +x /opt/vs/bin/ffmpeg /opt/vs/bin/ffprobe  && rm -rf /tmp/ffmpeg-*-static /tmp/ffmpeg-release-amd64-static.tar.xz
+#23 DONE 13.2s
+
+#24 [20/24] RUN set -eu;     DENY='ld-linux|/libc\.so|/libm\.so|/libpthread\.so|/librt\.so|/libdl\.so|/libresolv\.so|/libutil\.so|/libnsl\.so|linux-vdso|libcuda|libnvidia|/libGL|/libGLX|/libGLdispatch|/libEGL|/libOpenGL|/libstdc\+\+\.so|/libgcc_s\.so';     : > /tmp/vendor.list;     for f in "/opt/vs"/plugins/*.so "/opt/vs"/vspipe "/opt/vs"/libvapoursynth*.so* "/opt/vs"/libvsscript*.so*; do         [ -e "$f" ] || continue;         ldd "$f" 2>/dev/null | awk '/=> \//{print $3}';     done | sort -u | grep -Ev "${DENY}" | grep -v "^/opt/vs/" >> /tmp/vendor.list || true;     echo "=== vendoring $(wc -l < /tmp/vendor.list) libs into /opt/vs/lib ===";     while read -r lib; do         [ -n "$lib" ] && [ -e "$lib" ] || continue;         cp -Lv "$lib" "/opt/vs/lib/" 2>/dev/null || true;     done < /tmp/vendor.list;     cp -Lv /usr/lib/x86_64-linux-gnu/libOpenCL.so.1 "/opt/vs/lib/" 2>/dev/null || true;     echo "=== /opt/vs/lib now has $(ls -1 /opt/vs/lib/*.so* 2>/dev/null | wc -l) libs ===";     ln -sf "/opt/vs/share/NNEDI3CL/nnedi3_weights.bin" /nnedi3_weights.bin || true
+#24 0.444 === vendoring 121 libs into /opt/vs/lib ===
+#24 0.447 '/lib/x86_64-linux-gnu/libOpenCL.so.1' -> '/opt/vs/lib/libOpenCL.so.1'
+#24 0.450 '/lib/x86_64-linux-gnu/libX11.so.6' -> '/opt/vs/lib/libX11.so.6'
+#24 0.452 '/lib/x86_64-linux-gnu/libXau.so.6' -> '/opt/vs/lib/libXau.so.6'
+#24 0.454 '/lib/x86_64-linux-gnu/libXdmcp.so.6' -> '/opt/vs/lib/libXdmcp.so.6'
+#24 0.456 '/lib/x86_64-linux-gnu/libXext.so.6' -> '/opt/vs/lib/libXext.so.6'
+#24 0.458 '/lib/x86_64-linux-gnu/libXfixes.so.3' -> '/opt/vs/lib/libXfixes.so.3'
+#24 0.460 '/lib/x86_64-linux-gnu/libXrender.so.1' -> '/opt/vs/lib/libXrender.so.1'
+#24 0.466 '/lib/x86_64-linux-gnu/libaom.so.3' -> '/opt/vs/lib/libaom.so.3'
+#24 0.480 '/lib/x86_64-linux-gnu/libavcodec.so.58' -> '/opt/vs/lib/libavcodec.so.58'
+#24 0.485 '/lib/x86_64-linux-gnu/libavformat.so.58' -> '/opt/vs/lib/libavformat.so.58'
+#24 0.487 '/lib/x86_64-linux-gnu/libavutil.so.56' -> '/opt/vs/lib/libavutil.so.56'
+#24 0.490 '/lib/x86_64-linux-gnu/libblkid.so.1' -> '/opt/vs/lib/libblkid.so.1'
+#24 0.492 '/lib/x86_64-linux-gnu/libbluray.so.2' -> '/opt/vs/lib/libbluray.so.2'
+#24 0.494 '/lib/x86_64-linux-gnu/libboost_filesystem.so.1.74.0' -> '/opt/vs/lib/libboost_filesystem.so.1.74.0'
+#24 0.496 '/lib/x86_64-linux-gnu/libbrotlicommon.so.1' -> '/opt/vs/lib/libbrotlicommon.so.1'
+#24 0.498 '/lib/x86_64-linux-gnu/libbrotlidec.so.1' -> '/opt/vs/lib/libbrotlidec.so.1'
+#24 0.500 '/lib/x86_64-linux-gnu/libbsd.so.0' -> '/opt/vs/lib/libbsd.so.0'
+#24 0.502 '/lib/x86_64-linux-gnu/libbz2.so.1.0' -> '/opt/vs/lib/libbz2.so.1.0'
+#24 0.504 '/lib/x86_64-linux-gnu/libcairo-gobject.so.2' -> '/opt/vs/lib/libcairo-gobject.so.2'
+#24 0.506 '/lib/x86_64-linux-gnu/libcairo.so.2' -> '/opt/vs/lib/libcairo.so.2'
+#24 0.508 '/lib/x86_64-linux-gnu/libchromaprint.so.1' -> '/opt/vs/lib/libchromaprint.so.1'
+#24 0.521 '/lib/x86_64-linux-gnu/libcodec2.so.1.0' -> '/opt/vs/lib/libcodec2.so.1.0'
+#24 0.523 '/lib/x86_64-linux-gnu/libcom_err.so.2' -> '/opt/vs/lib/libcom_err.so.2'
+#24 0.529 '/lib/x86_64-linux-gnu/libcrypto.so.3' -> '/opt/vs/lib/libcrypto.so.3'
+#24 0.531 '/lib/x86_64-linux-gnu/libdatrie.so.1' -> '/opt/vs/lib/libdatrie.so.1'
+#24 0.534 '/lib/x86_64-linux-gnu/libdav1d.so.5' -> '/opt/vs/lib/libdav1d.so.5'
+#24 0.536 '/lib/x86_64-linux-gnu/libdrm.so.2' -> '/opt/vs/lib/libdrm.so.2'
+#24 0.538 '/lib/x86_64-linux-gnu/libexpat.so.1' -> '/opt/vs/lib/libexpat.so.1'
+#24 0.540 '/lib/x86_64-linux-gnu/libffi.so.8' -> '/opt/vs/lib/libffi.so.8'
+#24 0.544 '/lib/x86_64-linux-gnu/libfftw3f.so.3' -> '/opt/vs/lib/libfftw3f.so.3'
+#24 0.546 '/lib/x86_64-linux-gnu/libfftw3f_threads.so.3' -> '/opt/vs/lib/libfftw3f_threads.so.3'
+#24 0.548 '/lib/x86_64-linux-gnu/libfontconfig.so.1' -> '/opt/vs/lib/libfontconfig.so.1'
+#24 0.551 '/lib/x86_64-linux-gnu/libfreetype.so.6' -> '/opt/vs/lib/libfreetype.so.6'
+#24 0.553 '/lib/x86_64-linux-gnu/libfribidi.so.0' -> '/opt/vs/lib/libfribidi.so.0'
+#24 0.556 '/lib/x86_64-linux-gnu/libgcrypt.so.20' -> '/opt/vs/lib/libgcrypt.so.20'
+#24 0.559 '/lib/x86_64-linux-gnu/libgdk_pixbuf-2.0.so.0' -> '/opt/vs/lib/libgdk_pixbuf-2.0.so.0'
+#24 0.562 '/lib/x86_64-linux-gnu/libgio-2.0.so.0' -> '/opt/vs/lib/libgio-2.0.so.0'
+#24 0.565 '/lib/x86_64-linux-gnu/libglib-2.0.so.0' -> '/opt/vs/lib/libglib-2.0.so.0'
+#24 0.567 '/lib/x86_64-linux-gnu/libgme.so.0' -> '/opt/vs/lib/libgme.so.0'
+#24 0.569 '/lib/x86_64-linux-gnu/libgmodule-2.0.so.0' -> '/opt/vs/lib/libgmodule-2.0.so.0'
+#24 0.571 '/lib/x86_64-linux-gnu/libgmp.so.10' -> '/opt/vs/lib/libgmp.so.10'
+#24 0.575 '/lib/x86_64-linux-gnu/libgnutls.so.30' -> '/opt/vs/lib/libgnutls.so.30'
+#24 0.577 '/lib/x86_64-linux-gnu/libgobject-2.0.so.0' -> '/opt/vs/lib/libgobject-2.0.so.0'
+#24 0.579 '/lib/x86_64-linux-gnu/libgomp.so.1' -> '/opt/vs/lib/libgomp.so.1'
+#24 0.581 '/lib/x86_64-linux-gnu/libgpg-error.so.0' -> '/opt/vs/lib/libgpg-error.so.0'
+#24 0.583 '/lib/x86_64-linux-gnu/libgraphite2.so.3' -> '/opt/vs/lib/libgraphite2.so.3'
+#24 0.585 '/lib/x86_64-linux-gnu/libgsm.so.1' -> '/opt/vs/lib/libgsm.so.1'
+#24 0.587 '/lib/x86_64-linux-gnu/libgssapi_krb5.so.2' -> '/opt/vs/lib/libgssapi_krb5.so.2'
+#24 0.590 '/lib/x86_64-linux-gnu/libharfbuzz.so.0' -> '/opt/vs/lib/libharfbuzz.so.0'
+#24 0.592 '/lib/x86_64-linux-gnu/libhogweed.so.6' -> '/opt/vs/lib/libhogweed.so.6'
+#24 0.616 '/lib/x86_64-linux-gnu/libicudata.so.70' -> '/opt/vs/lib/libicudata.so.70'
+#24 0.620 '/lib/x86_64-linux-gnu/libicuuc.so.70' -> '/opt/vs/lib/libicuuc.so.70'
+#24 0.623 '/lib/x86_64-linux-gnu/libidn2.so.0' -> '/opt/vs/lib/libidn2.so.0'
+#24 0.625 '/lib/x86_64-linux-gnu/libjpeg.so.8' -> '/opt/vs/lib/libjpeg.so.8'
+#24 0.627 '/lib/x86_64-linux-gnu/libk5crypto.so.3' -> '/opt/vs/lib/libk5crypto.so.3'
+#24 0.629 '/lib/x86_64-linux-gnu/libkeyutils.so.1' -> '/opt/vs/lib/libkeyutils.so.1'
+#24 0.632 '/lib/x86_64-linux-gnu/libkrb5.so.3' -> '/opt/vs/lib/libkrb5.so.3'
+#24 0.634 '/lib/x86_64-linux-gnu/libkrb5support.so.0' -> '/opt/vs/lib/libkrb5support.so.0'
+#24 0.636 '/lib/x86_64-linux-gnu/liblzma.so.5' -> '/opt/vs/lib/liblzma.so.5'
+#24 0.638 '/lib/x86_64-linux-gnu/libmd.so.0' -> '/opt/vs/lib/libmd.so.0'
+#24 0.640 '/lib/x86_64-linux-gnu/libmfx.so.1' -> '/opt/vs/lib/libmfx.so.1'
+#24 0.642 '/lib/x86_64-linux-gnu/libmount.so.1' -> '/opt/vs/lib/libmount.so.1'
+#24 0.645 '/lib/x86_64-linux-gnu/libmp3lame.so.0' -> '/opt/vs/lib/libmp3lame.so.0'
+#24 0.647 '/lib/x86_64-linux-gnu/libmpg123.so.0' -> '/opt/vs/lib/libmpg123.so.0'
+#24 0.649 '/lib/x86_64-linux-gnu/libnettle.so.8' -> '/opt/vs/lib/libnettle.so.8'
+#24 0.651 '/lib/x86_64-linux-gnu/libnorm.so.1' -> '/opt/vs/lib/libnorm.so.1'
+#24 0.654 '/lib/x86_64-linux-gnu/libnuma.so.1' -> '/opt/vs/lib/libnuma.so.1'
+#24 0.656 '/lib/x86_64-linux-gnu/libogg.so.0' -> '/opt/vs/lib/libogg.so.0'
+#24 0.658 '/lib/x86_64-linux-gnu/libopenjp2.so.7' -> '/opt/vs/lib/libopenjp2.so.7'
+#24 0.661 '/lib/x86_64-linux-gnu/libopenmpt.so.0' -> '/opt/vs/lib/libopenmpt.so.0'
+#24 0.663 '/lib/x86_64-linux-gnu/libopus.so.0' -> '/opt/vs/lib/libopus.so.0'
+#24 0.666 '/lib/x86_64-linux-gnu/libp11-kit.so.0' -> '/opt/vs/lib/libp11-kit.so.0'
+#24 0.669 '/lib/x86_64-linux-gnu/libpango-1.0.so.0' -> '/opt/vs/lib/libpango-1.0.so.0'
+#24 0.671 '/lib/x86_64-linux-gnu/libpangocairo-1.0.so.0' -> '/opt/vs/lib/libpangocairo-1.0.so.0'
+#24 0.673 '/lib/x86_64-linux-gnu/libpangoft2-1.0.so.0' -> '/opt/vs/lib/libpangoft2-1.0.so.0'
+#24 0.675 '/lib/x86_64-linux-gnu/libpcre.so.3' -> '/opt/vs/lib/libpcre.so.3'
+#24 0.677 '/lib/x86_64-linux-gnu/libpcre2-8.so.0' -> '/opt/vs/lib/libpcre2-8.so.0'
+#24 0.679 '/lib/x86_64-linux-gnu/libpgm-5.3.so.0' -> '/opt/vs/lib/libpgm-5.3.so.0'
+#24 0.682 '/lib/x86_64-linux-gnu/libpixman-1.so.0' -> '/opt/vs/lib/libpixman-1.so.0'
+#24 0.683 '/lib/x86_64-linux-gnu/libpng16.so.16' -> '/opt/vs/lib/libpng16.so.16'
+#24 0.686 '/lib/x86_64-linux-gnu/librabbitmq.so.4' -> '/opt/vs/lib/librabbitmq.so.4'
+#24 0.695 '/lib/x86_64-linux-gnu/librsvg-2.so.2' -> '/opt/vs/lib/librsvg-2.so.2'
+#24 0.698 '/lib/x86_64-linux-gnu/libselinux.so.1' -> '/opt/vs/lib/libselinux.so.1'
+#24 0.700 '/lib/x86_64-linux-gnu/libshine.so.3' -> '/opt/vs/lib/libshine.so.3'
+#24 0.702 '/lib/x86_64-linux-gnu/libsnappy.so.1' -> '/opt/vs/lib/libsnappy.so.1'
+#24 0.704 '/lib/x86_64-linux-gnu/libsodium.so.23' -> '/opt/vs/lib/libsodium.so.23'
+#24 0.706 '/lib/x86_64-linux-gnu/libsoxr.so.0' -> '/opt/vs/lib/libsoxr.so.0'
+#24 0.708 '/lib/x86_64-linux-gnu/libspeex.so.1' -> '/opt/vs/lib/libspeex.so.1'
+#24 0.710 '/lib/x86_64-linux-gnu/libsrt-gnutls.so.1.4' -> '/opt/vs/lib/libsrt-gnutls.so.1.4'
+#24 0.712 '/lib/x86_64-linux-gnu/libssh-gcrypt.so.4' -> '/opt/vs/lib/libssh-gcrypt.so.4'
+#24 0.715 '/lib/x86_64-linux-gnu/libssl.so.3' -> '/opt/vs/lib/libssl.so.3'
+#24 0.717 '/lib/x86_64-linux-gnu/libswresample.so.3' -> '/opt/vs/lib/libswresample.so.3'
+#24 0.719 '/lib/x86_64-linux-gnu/libswscale.so.5' -> '/opt/vs/lib/libswscale.so.5'
+#24 0.721 '/lib/x86_64-linux-gnu/libtasn1.so.6' -> '/opt/vs/lib/libtasn1.so.6'
+#24 0.723 '/lib/x86_64-linux-gnu/libthai.so.0' -> '/opt/vs/lib/libthai.so.0'
+#24 0.725 '/lib/x86_64-linux-gnu/libtheoradec.so.1' -> '/opt/vs/lib/libtheoradec.so.1'
+#24 0.727 '/lib/x86_64-linux-gnu/libtheoraenc.so.1' -> '/opt/vs/lib/libtheoraenc.so.1'
+#24 0.729 '/lib/x86_64-linux-gnu/libtwolame.so.0' -> '/opt/vs/lib/libtwolame.so.0'
+#24 0.731 '/lib/x86_64-linux-gnu/libudfread.so.0' -> '/opt/vs/lib/libudfread.so.0'
+#24 0.734 '/lib/x86_64-linux-gnu/libunistring.so.2' -> '/opt/vs/lib/libunistring.so.2'
+#24 0.736 '/lib/x86_64-linux-gnu/libuuid.so.1' -> '/opt/vs/lib/libuuid.so.1'
+#24 0.738 '/lib/x86_64-linux-gnu/libva-drm.so.2' -> '/opt/vs/lib/libva-drm.so.2'
+#24 0.740 '/lib/x86_64-linux-gnu/libva-x11.so.2' -> '/opt/vs/lib/libva-x11.so.2'
+#24 0.742 '/lib/x86_64-linux-gnu/libva.so.2' -> '/opt/vs/lib/libva.so.2'
+#24 0.744 '/lib/x86_64-linux-gnu/libvdpau.so.1' -> '/opt/vs/lib/libvdpau.so.1'
+#24 0.746 '/lib/x86_64-linux-gnu/libvorbis.so.0' -> '/opt/vs/lib/libvorbis.so.0'
+#24 0.748 '/lib/x86_64-linux-gnu/libvorbisenc.so.2' -> '/opt/vs/lib/libvorbisenc.so.2'
+#24 0.750 '/lib/x86_64-linux-gnu/libvorbisfile.so.3' -> '/opt/vs/lib/libvorbisfile.so.3'
+#24 0.756 '/lib/x86_64-linux-gnu/libvpx.so.7' -> '/opt/vs/lib/libvpx.so.7'
+#24 0.758 '/lib/x86_64-linux-gnu/libwebp.so.7' -> '/opt/vs/lib/libwebp.so.7'
+#24 0.760 '/lib/x86_64-linux-gnu/libwebpmux.so.3' -> '/opt/vs/lib/libwebpmux.so.3'
+#24 0.763 '/lib/x86_64-linux-gnu/libx264.so.163' -> '/opt/vs/lib/libx264.so.163'
+#24 0.778 '/lib/x86_64-linux-gnu/libx265.so.199' -> '/opt/vs/lib/libx265.so.199'
+#24 0.780 '/lib/x86_64-linux-gnu/libxcb-render.so.0' -> '/opt/vs/lib/libxcb-render.so.0'
+#24 0.782 '/lib/x86_64-linux-gnu/libxcb-shm.so.0' -> '/opt/vs/lib/libxcb-shm.so.0'
+#24 0.784 '/lib/x86_64-linux-gnu/libxcb.so.1' -> '/opt/vs/lib/libxcb.so.1'
+#24 0.787 '/lib/x86_64-linux-gnu/libxml2.so.2' -> '/opt/vs/lib/libxml2.so.2'
+#24 0.790 '/lib/x86_64-linux-gnu/libxvidcore.so.4' -> '/opt/vs/lib/libxvidcore.so.4'
+#24 0.792 '/lib/x86_64-linux-gnu/libz.so.1' -> '/opt/vs/lib/libz.so.1'
+#24 0.794 '/lib/x86_64-linux-gnu/libzmq.so.5' -> '/opt/vs/lib/libzmq.so.5'
+#24 0.797 '/lib/x86_64-linux-gnu/libzvbi.so.0' -> '/opt/vs/lib/libzvbi.so.0'
+#24 0.800 '/usr/lib/x86_64-linux-gnu/libOpenCL.so.1' -> '/opt/vs/lib/libOpenCL.so.1'
+#24 0.804 === /opt/vs/lib now has 128 libs ===
+#24 DONE 0.9s
+
+#25 [21/24] RUN set -eu;     MISSING=0;     for f in "/opt/vs"/plugins/*.so; do         out=$(LD_LIBRARY_PATH="/opt/vs/lib" ldd "$f" 2>/dev/null | grep "not found" || true);         if [ -n "$out" ]; then echo "STILL MISSING for $(basename $f):"; echo "$out"; MISSING=1; fi;     done;     if [ "$MISSING" -ne 0 ]; then echo "FATAL: unvendored plugin deps remain"; exit 1; fi;     echo "OK: all plugin deps satisfied by bundle libs (modulo host glibc/GPU driver)"
+#25 0.386 OK: all plugin deps satisfied by bundle libs (modulo host glibc/GPU driver)
+#25 DONE 0.4s
+
+#26 [22/24] RUN /opt/vs/py/bin/python - <<'PY'
+#26 0.515 Plugins autoloaded: 21
+#26 0.515   - bwdif
+#26 0.515   - cas
+#26 0.515   - ctmf
+#26 0.515   - dctf
+#26 0.515   - deblock
+#26 0.515   - dfttest
+#26 0.515   - eedi2
+#26 0.515   - fmtc
+#26 0.515   - focus2
+#26 0.515   - knlm
+#26 0.515   - lsmas
+#26 0.515   - misc
+#26 0.515   - mv
+#26 0.515   - nnedi3cl
+#26 0.515   - resize
+#26 0.515   - rgvs
+#26 0.515   - sangnom
+#26 0.515   - std
+#26 0.515   - text
+#26 0.515   - warp
+#26 0.515   - znedi3
+#26 0.515 OK: all required plugin namespaces present
+#26 0.515 OK: havsfunc / vsdehalo / nnedi3_rpow2 import
+#26 DONE 0.6s
+
+#27 [23/24] COPY export_bundle.sh /usr/local/bin/export_bundle.sh
+#27 DONE 0.0s
+
+#28 [24/24] RUN chmod +x /usr/local/bin/export_bundle.sh
+#28 DONE 0.2s
+
+#29 exporting to image
+#29 exporting layers
+#29 exporting layers 4.2s done
+#29 exporting manifest sha256:e1605e1f5414cf39e4bbb17eac287fc4a748b54e4e4bb7fefd197fa45b19c704 0.0s done
+#29 exporting config sha256:e2ec059f44e48d28b6eebb801de69a8a142e350b72f266b17e525afe6ce438e3 0.0s done
+#29 exporting attestation manifest sha256:ff5e7cd448d3d3d49a94a6063b80504afdfdd6240d9d5265afc8f14bf5ea8027 0.0s done
+#29 exporting manifest list sha256:27aa191895da9807381def51ea25706f83dc5a2a1e5c854f7254f1db612287be 0.0s done
+#29 naming to docker.io/library/vs-oven:r76 done
+#29 unpacking to docker.io/library/vs-oven:r76
+#29 unpacking to docker.io/library/vs-oven:r76 1.4s done
+#29 DONE 5.8s
+EXIT=0

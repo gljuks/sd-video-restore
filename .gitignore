@@ -1,0 +1,44 @@
+# ── Heavy media / captures (NEVER commit — 53G .mov lives here) ─────────────
+*.mov
+*.mp4
+*.avi
+*.mkv
+*.mts
+*.m2ts
+*.dv
+*.vob
+*.wmv
+*.mpg
+*.mpeg
+
+# lsmas / ffms2 index sidecars
+*.lwi
+*.ffindex
+
+# ── Pipeline outputs ────────────────────────────────────────────────────────
+/Target/*
+/Source/*
+!/Source/.gitkeep
+!/Target/.gitkeep
+
+# ── Built / downloaded binaries (keep colab SOURCE, drop artifacts) ──────────
+/colab/out/
+*.tar.zst
+*.zst
+/_install/
+*.zip
+
+# ── Editor / OS cruft ───────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+*.swp
+__pycache__/
+.hermes/
+
+# Raw y4m intermediates (vspipe dumps)
+*.y4m
+_globe_result.json
+_probe.bat
+note.txt
+/vs-portable-win/
+vs-portable-win.7z
