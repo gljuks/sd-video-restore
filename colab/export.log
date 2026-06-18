@@ -1,0 +1,12 @@
+==> RPATH-fixing binaries
+==> shrinking Python venv
+bundle: vs-portable-linux-py312
+vapoursynth: R76
+python: Python 3.12.13
+built: 2026-06-08T19:57:37Z
+plugins: 17
+
+==> tar + zstd -> /out/vs-portable-linux-py312.tar.zst
+-rwxrwxrwx 1 1000 1000 235M Jun  8 19:57 /out/vs-portable-linux-py312.tar.zst
+==> DONE. Upload as GitHub Release asset and copy URL into the notebook.
+EXPORT_EXIT=0
