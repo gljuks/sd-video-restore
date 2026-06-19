@@ -304,6 +304,38 @@ build_eedi2() {
 build eedi2 opt build_eedi2
 
 # ============================================================================
+# AI UPSCALE (vs-mlrt: prebuilt Linux binaries, no compilation needed)
+# ============================================================================
+
+build_vsmlrt() {
+    local VER="v15.16"
+    local BASE="https://github.com/AmusementClub/vs-mlrt/releases/download/${VER}"
+
+    # vsncnn.so + libncnn.so
+    wget -qO /tmp/vsncnn.7z "${BASE}/VSNCNN-Linux-x64.${VER}.7z"
+    7z x -o/tmp/vsncnn /tmp/vsncnn.7z -y >/dev/null 2>&1
+    find /tmp/vsncnn -name '*.so' -exec cp -v {} "${PLUGINDIR}/" \; 2>/dev/null
+    rm -rf /tmp/vsncnn /tmp/vsncnn.7z
+
+    # vsmlrt.py
+    wget -qO /tmp/vsmlrt.7z "${BASE}/scripts.${VER}.7z"
+    7z x -o/tmp/vsmlrt /tmp/vsmlrt.7z -y >/dev/null 2>&1
+    cp /tmp/vsmlrt/vsmlrt.py "${VSPREFIX}/py/lib/python3.12/site-packages/"
+    rm -rf /tmp/vsmlrt /tmp/vsmlrt.7z
+
+    # CUGAN models
+    wget -qO /tmp/models.7z "${BASE}/models.${VER}.7z"
+    7z x -o/tmp/models /tmp/models.7z -y >/dev/null 2>&1
+    mkdir -p "${PLUGINDIR}/models"
+    # Only copy cugan models (not rife, dpir, etc) to save ~700MB
+    cp -r /tmp/models/models/cugan "${PLUGINDIR}/models/" 2>/dev/null
+    rm -rf /tmp/models /tmp/models.7z
+
+    echo "  vs-mlrt ${VER} installed"
+}
+build vsmlrt opt build_vsmlrt
+
+# ============================================================================
 # Summary
 # ============================================================================
 echo

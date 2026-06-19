@@ -26,6 +26,16 @@ def _shimmed_getattr(self, name):
     return _orig_getattr(self, name)
 _vs2.Core.__getattr__ = _shimmed_getattr
 
+# Portable: explicitly load plugins. VAPOURSYNTH_PLUGIN_PATH autoload
+# doesn't work with Python embeddable — LoadPlugin is a harmless no-op
+# for already-loaded plugins.
+import glob as _glob
+_plugdir = os.environ.get('VAPOURSYNTH_PLUGIN_PATH', '')
+if _plugdir:
+    for _dll in _glob.glob(os.path.join(_plugdir, '*.dll')):
+        try: core.std.LoadPlugin(_dll)
+        except: pass
+
 import havsfunc as haf
 import nnedi3_rpow2 as rpow2
 import vsdehalo

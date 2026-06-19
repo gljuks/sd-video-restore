@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-"""Patch havsfunc.py to pass explicit nnedi3 weights path via partial."""
+"""Patch havsfunc.py to pass explicit nnedi3 weights path via partial,
+and fix eedi3m EEDI3CL -> EEDI3 rename."""
 import os
 
 vsprefix = os.environ.get("VSPREFIX", "/opt/vs")
@@ -8,9 +9,8 @@ f = os.path.join(vsprefix, "py/lib/python3.12/site-packages/havsfunc.py")
 with open(f) as fh:
     src = fh.read()
 
-# The partial creation line that wraps core.znedi3.nnedi3
+# Fix 1: znedi3 weights path
 old = "        nnedi3 = partial(core.znedi3.nnedi3, field=field, **nnedi3_args)"
-
 new_lines = [
     "        import os as _hnos",
     "        _hnw = _hnos.path.join(_hnos.environ.get('VSPREFIX','/opt/vs'),'share','NNEDI3CL','nnedi3_weights.bin')",
@@ -21,13 +21,23 @@ new = "\n".join(new_lines)
 
 if old in src:
     src = src.replace(old, new)
-    with open(f, "w") as fh:
-        fh.write(src)
-    print("OK: havsfunc.py patched at partial creation")
+    znedi3_ok = True
 else:
-    print("ERROR: target not found")
-    idx = src.find("nnedi3 = partial")
-    if idx >= 0:
-        print(repr(src[idx:idx+200]))
-    else:
-        print("partial not found at all")
+    znedi3_ok = False
+
+# Fix 2: eedi3m renamed EEDI3CL -> EEDI3
+eedi3_count = src.count("core.eedi3m.EEDI3CL")
+src = src.replace("core.eedi3m.EEDI3CL", "core.eedi3m.EEDI3")
+
+with open(f, "w") as fh:
+    fh.write(src)
+
+parts = []
+if znedi3_ok:
+    parts.append("znedi3 weights")
+if eedi3_count:
+    parts.append(f"EEDI3CL x{eedi3_count}")
+if parts:
+    print(f"OK: havsfunc.py patched ({', '.join(parts)})")
+else:
+    print("WARNING: neither patch target found in havsfunc.py")

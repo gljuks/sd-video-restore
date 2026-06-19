@@ -54,16 +54,33 @@ cp "$PLUGIN_SRC"/*.bin "$DEST/plugins64/" 2>/dev/null || true
 # --- nnedi3_rpow2 (not on PyPI) ---
 cp /mnt/e/avis/colab/nnedi3_rpow2.py "$DEST/python/Lib/site-packages/" 2>/dev/null || true
 
+# --- vsmlrt.py (AI upscale) ---
+echo "=== Installing vsmlrt.py ==="
+VSMLRT_SRC="/mnt/c/Users/gatis/AppData/Local/Programs/Python/Python312/Lib/site-packages/vsmlrt.py"
+cp "$VSMLRT_SRC" "$DEST/python/Lib/site-packages/" 2>/dev/null && echo "  vsmlrt OK" || echo "  vsmlrt NOT FOUND (AI upscale won't work)"
+
+# --- CUGAN models for AI upscale ---
+echo "=== Copying CUGAN models ==="
+MODEL_SRC="$PLUGIN_SRC/models"
+if [ -d "$MODEL_SRC" ]; then
+    mkdir -p "$DEST/plugins64/models"
+    cp -r "$MODEL_SRC"/* "$DEST/plugins64/models/" 2>/dev/null && echo "  models OK" || echo "  models copy failed"
+else
+    echo "  models NOT FOUND at $MODEL_SRC"
+fi
+
 # --- adjust.py (raw module, no package) ---
 echo "=== Installing adjust.py ==="
 wget -q -O "$DEST/python/Lib/site-packages/adjust.py" \
     "https://raw.githubusercontent.com/dubhater/vapoursynth-adjust/master/adjust.py" 2>/dev/null || true
 
-# --- Scripts (templates + bats) ---
+# --- Scripts (templates + bats + gen.ps1) ---
 echo "=== Copying scripts ==="
 cp "/mnt/e/avis/VapourSynth Templates"/*.vpy "$DEST/scripts/"
-cp /mnt/e/avis/createvpy.bat /mnt/e/avis/createvpyGPU.bat "$DEST/scripts/"
-cp /mnt/e/avis/convertvpy.bat /mnt/e/avis/convertvpyNV.bat "$DEST/scripts/"
+cp /mnt/e/avis/create.bat "$DEST/scripts/"
+cp /mnt/e/avis/convert.bat "$DEST/scripts/"
+cp /mnt/e/avis/create.ps1 "$DEST/scripts/"
+cp /mnt/e/avis/gen.ps1 "$DEST/scripts/"
 cp /mnt/e/avis/_vpy_getsrc.ps1 "$DEST/scripts/"
 
 # --- run.bat launcher ---
@@ -80,7 +97,8 @@ IF "%1"=="" (
     ECHO   plugins: %VSROOT%plugins64\
     ECHO   python:  %VSROOT%python\python.exe
     ECHO.
-    ECHO Drop a video on createvpy.bat, then run convertvpy.bat
+    ECHO   Drop a video on create.bat, then run convert.bat
+    ECHO   Or run: create.ps1 (GUI dialog)  /  create.bat file.mov (headless)
     CMD /K
 ) ELSE (
     %*

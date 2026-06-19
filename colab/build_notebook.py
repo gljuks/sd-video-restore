@@ -374,10 +374,17 @@ except Exception as e:
 clip = core.resize.Bicubic(clip, format=vs.RGBS, matrix_in_s="170m")
 clip = core.resize.Bicubic(clip, format=vs.YUV420P8, matrix_s="709")
 
-# ---------- UPSCALE: nnedi3cl on opencl, znedi3 on cuda/cpu -----------------
-upsizer = "nnedi3cl" if OPENCL else "znedi3"
-clip = rpow2.nnedi3_rpow2(clip, rfactor=2, nns=4, qual=2, upsizer=upsizer,
-                          width=1440, height=1080)
+# ---------- UPSCALE: nnedi3cl on opencl, znedi3 on cuda/cpu, CUGAN on ai ----
+if GPU_MODE == "ai":
+    from vsmlrt import CUGAN, Backend
+    clip = CUGAN(clip, noise=-1, scale=2, version=2,
+                 backend=Backend.NCNN_VK(num_streams=1, fp16=True))
+    clip = core.resize.Bicubic(clip, format=vs.YUV420P8, matrix_s="709",
+                               width=1440, height=1080)
+else:
+    upsizer = "nnedi3cl" if OPENCL else "znedi3"
+    clip = rpow2.nnedi3_rpow2(clip, rfactor=2, nns=4, qual=2, upsizer=upsizer,
+                              width=1440, height=1080)
 
 # ---------- CAS sharpen -----------------------------------------------------
 clip = core.cas.CAS(clip, sharpness=0.4)
