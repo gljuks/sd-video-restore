@@ -55,8 +55,8 @@ _assemble_portable.sh    build Windows portable VS bundle
 
 Prebuilt bundles on the [Releases](https://github.com/gljuks/sd-video-restore/releases) page:
 
-- **Windows portable** (`vs-portable-win.7z`) — extract anywhere, no install needed
-- **Colab tarball** (`vs-portable-linux-py312.tar.zst`) — for the Colab notebook
+- **Windows portable** — [vs-portable-win-ai.7z](https://github.com/gljuks/sd-video-restore/releases/download/v0.1-ai/vs-portable-win-ai.7z)
+- **Colab tarball** — [vs-portable-linux-py312.tar.zst](https://github.com/gljuks/sd-video-restore/releases/download/v0.1-ai/vs-portable-linux-py312.tar.zst)
 
 ## Colab
 

@@ -37,7 +37,7 @@ RealCUGAN-pro model (`pro-no-denoise3x-up2x.onnx`, noise=-1, scale=2, version=2)
 
 Release tarball at:
 
-    https://github.com/gljuks/sd-video-restore/releases/latest/download/vs-portable-linux-py312.tar.zst
+    https://github.com/gljuks/sd-video-restore/releases/download/v0.1-ai/vs-portable-linux-py312.tar.zst
 
 (or a specific version tag). Cell 2 is pre-filled with this URL.
 Rebuild only when plugins change:
