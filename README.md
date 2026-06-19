@@ -14,9 +14,10 @@ crop; you can override everything:
 - **Field** — TFF or BFF
 - **Crop** — none, edges (all 4 sides), VHS (Crop + AddBorders with optional
   "add borders" checkbox), or custom expression
-- **Denoise** — hqdn3d CPU denoise (on by default)
-- **Upscale** — GPU (nnedi3cl, ~46 fps), CPU (znedi3, ~32 fps), or AI
-  (RealCUGAN-pro 2x via vs-mlrt NCNN/Vulkan, ~3 fps on RTX 3050)
+- **Denoise** — hqdn3d CPU denoise (on by default; skipped when AI upscale selected)
+- **Upscale** — GPU (nnedi3cl, ~46 fps), GPU/CPU (znedi3, ~32 fps, uses CUDA/OpenCL,
+  falls back to CPU if neither present), or AI (RealCUGAN-pro 2x via vs-mlrt
+  NCNN/Vulkan, ~3 fps on RTX 3050 — also handles denoising)
 - **DAR** — 4:3 -> 1440x1080, 16:9 -> 1920x1080
 
 Generates per-clip scripts in `Source/`. Then run `convert.bat` (edit `ENCODER`
@@ -31,8 +32,11 @@ Set `DURATION=` in `convert.bat` to blank for full render, `120` for a smoke tes
 ## AI Upscale
 
 Uses RealCUGAN-pro 2x (`pro-no-denoise3x-up2x.onnx`) via [vs-mlrt](https://github.com/AmusementClub/vs-mlrt)
-NCNN/Vulkan backend. Parameters: noise=-1 (no denoise — QTGMC + hqdn3d handle
-that upstream), scale=2, version=2 (pro variant trained on degraded sources).
+NCNN/Vulkan backend. When AI upscale is selected, CUGAN handles both upscaling
+and denoising — the hqdn3d denoise step is skipped. Parameters: noise=-1
+(adaptive), scale=2, version=2 (pro variant trained on degraded sources).
+
+On Colab the notebook also moves denoising to CUGAN when `VS_GPU_MODE=ai`.
 
 The model is bundled in the portable builds. No separate download needed.
 
@@ -64,10 +68,13 @@ Upload `colab/Analog_Restore_Colab.ipynb` to Colab. `BUNDLE_URL` points to the
 latest release tarball. Drop source files in Drive at `avis/Source_in/`, run all cells.
 
 The notebook supports three GPU modes set by `VS_GPU_MODE` env var:
-`opencl` (nnedi3cl), `cuda` (znedi3 CPU fallback), `ai` (CUGAN).
+`opencl` (nnedi3cl + KNLMeansCL), `cuda` (znedi3 + hqdn3d), `ai` (CUGAN upscale + denoise).
 
 ## GPU notes (RTX 3050 Laptop, 4GB)
 
-nnedi3cl upscale works (1.41x over CPU znedi3). KNLMeansCL is broken on this
-driver. QTGMC stays opencl=False. AI upscale (CUGAN) uses Vulkan — works on
+nnedi3cl uses GPU OpenCL (1.41x over znedi3). znedi3 uses CUDA or OpenCL where
+available, falling back to CPU only if neither is present. KNLMeansCL is broken on
+this driver. QTGMC stays opencl=False. AI upscale (CUGAN) uses Vulkan — works on
 any GPU, ~3 fps.
+
+
